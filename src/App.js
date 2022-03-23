@@ -1,25 +1,68 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import Template from "./components/Template.js";
+import TodoList from "./components/TodoList.js";
+import { MdAddCircle } from "react-icons/md";
+import TodoInsert from "./components/TodoInsert";
 
-function App() {
+const nextId = 4;
+const App = () => {
+  const [selectedTodo, setSelectedTodo] = useState(null);
+  const [insertToggle, setInsertToggle] = useState(false);
+  const [todos, setTodos] = useState([
+    { id: 1, text: "할일 1", checked: true },
+    { id: 2, text: "할일 2", checked: false },
+    { id: 3, text: "할일 3", checked: true },
+  ]);
+
+  const onInsertToggle = () => {
+    setInsertToggle((prev) => !prev);
+  };
+  const onInsertTodo = (text) => {
+    if (text === "") {
+      return alert("할 일을 입력해주세요.");
+    } else {
+      const todo = {
+        id: nextId,
+        text,
+        checked: false,
+      };
+      setTodos((todos) => todos.concat(todo));
+      nextId++;
+    }
+  };
+  const onCheckToggle = (id) => {
+    setTodos((todos) =>
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, checked: !todo.checked } : todo
+      )
+    );
+  };
+
+  const onChangeSelectedTodo = (todo) => {
+    setSelectedTodo(todo);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Template todoLength={todos.length}>
+      <TodoList
+        todos={todos}
+        onCheckToggle={onCheckToggle}
+        onInsertToggle={onInsertToggle}
+        onChangeSelectedTodo={onChangeSelectedTodo}
+      />
+      <div className="add-todo-button" onClick={onInsertToggle}>
+        <MdAddCircle />
+      </div>
+      {insertToggle && (
+        <TodoInsert
+          selectedTodo={selectedTodo}
+          onInsertToggle={onInsertToggle}
+          onInsertTodo={onInsertTodo}
+        />
+      )}
+    </Template>
   );
-}
+};
 
 export default App;
